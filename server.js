@@ -18,8 +18,7 @@ app.use(cors());
 app.use(express.json());
 
 // 🗺️ Armazena a localização dos usuários em memória
-// Agora usa o userName como chave
-let userLocations = {}; // { userName: { latitude, longitude, updatedAt } }
+let userLocations = {}; // { userId: { latitude, longitude, updatedAt } }
 
 // 🛰️ Quando um cliente se conecta via socket
 io.on("connection", (socket) => {
@@ -27,17 +26,17 @@ io.on("connection", (socket) => {
 
   // Recebe localização do app
   socket.on("sendLocation", (data) => {
-    const { userName, latitude, longitude } = data;
-    if (!userName || !latitude || !longitude) return;
+    const { userId, latitude, longitude } = data;
+    if (!userId || !latitude || !longitude) return;
 
-    userLocations[userName] = {
+    userLocations[userId] = {
       latitude,
       longitude,
       updatedAt: new Date(),
     };
 
-    // Emite atualização apenas para viewers desse usuário
-    io.emit(`locationUpdate-${userName}`, {
+    // Emite atualização apenas para viewers do mesmo usuário
+    io.emit(`locationUpdate-${userId}`, {
       latitude,
       longitude,
       updatedAt: new Date(),
@@ -45,7 +44,7 @@ io.on("connection", (socket) => {
 
     console.log(
       chalk.blue(
-        `📍 Localização recebida de ${userName}: ${latitude}, ${longitude}`
+        `📍 Localização recebida de ${userId}: ${latitude}, ${longitude}`
       )
     );
   });
@@ -56,9 +55,9 @@ io.on("connection", (socket) => {
 });
 
 // 📍 Endpoint para obter última localização de um usuário
-app.get("/api/location/:userName", (req, res) => {
-  const { userName } = req.params;
-  const loc = userLocations[userName];
+app.get("/api/location/:userId", (req, res) => {
+  const { userId } = req.params;
+  const loc = userLocations[userId];
 
   if (!loc) {
     return res.status(404).json({ message: "Usuário ainda não enviou localização" });
@@ -68,7 +67,7 @@ app.get("/api/location/:userName", (req, res) => {
 });
 
 // 🌎 Página pública com o mapa (viewer.html)
-app.get("/track/:userName", (req, res) => {
+app.get("/track/:userId", (req, res) => {
   res.sendFile(path.join(process.cwd(), "viewer.html"));
 });
 
