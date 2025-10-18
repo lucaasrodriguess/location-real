@@ -64,6 +64,7 @@
 
     <div id="map"></div>
 
+    <!-- ✅ Adicionado id="userId" (corrige o erro) -->
     <div class="info">
       <strong>Usuário:</strong> <span id="userId"></span><br />
       <small>Última atualização: <span id="updatedAt">--</span></small>
@@ -72,6 +73,7 @@
     <script>
       const SERVER_URL = "https://wilful-emlyn-safeher-41c63af9.koyeb.app";
 
+      // Captura o userId da URL (ex: /track/123)
       const userId = window.location.pathname.split("/").pop();
       document.getElementById("userId").textContent = userId;
 
