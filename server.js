@@ -67,7 +67,7 @@ app.get("/api/location/:userId", (req, res) => {
 });
 
 // 🌎 Página pública com o mapa (viewer.html)
-app.get("/track/:userId", (req, res) => {
+app.get("/track/:userName", (req, res) => {
   res.sendFile(path.join(process.cwd(), "viewer.html"));
 });
 
