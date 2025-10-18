@@ -18,7 +18,8 @@ app.use(cors());
 app.use(express.json());
 
 // 🗺️ Armazena a localização dos usuários em memória
-let userLocations = {}; // { userId: { latitude, longitude, updatedAt } }
+// Agora usa o userName como chave
+let userLocations = {}; // { userName: { latitude, longitude, updatedAt } }
 
 // 🛰️ Quando um cliente se conecta via socket
 io.on("connection", (socket) => {
@@ -26,17 +27,17 @@ io.on("connection", (socket) => {
 
   // Recebe localização do app
   socket.on("sendLocation", (data) => {
-    const { userId, latitude, longitude } = data;
-    if (!userId || !latitude || !longitude) return;
+    const { userName, latitude, longitude } = data;
+    if (!userName || !latitude || !longitude) return;
 
-    userLocations[userId] = {
+    userLocations[userName] = {
       latitude,
       longitude,
       updatedAt: new Date(),
     };
 
-    // Emite atualização apenas para viewers do mesmo usuário
-    io.emit(`locationUpdate-${userId}`, {
+    // Emite atualização apenas para viewers desse usuário
+    io.emit(`locationUpdate-${userName}`, {
       latitude,
       longitude,
       updatedAt: new Date(),
@@ -44,7 +45,7 @@ io.on("connection", (socket) => {
 
     console.log(
       chalk.blue(
-        `📍 Localização recebida de ${userId}: ${latitude}, ${longitude}`
+        `📍 Localização recebida de ${userName}: ${latitude}, ${longitude}`
       )
     );
   });
@@ -55,9 +56,9 @@ io.on("connection", (socket) => {
 });
 
 // 📍 Endpoint para obter última localização de um usuário
-app.get("/api/location/:userId", (req, res) => {
-  const { userId } = req.params;
-  const loc = userLocations[userId];
+app.get("/api/location/:userName", (req, res) => {
+  const { userName } = req.params;
+  const loc = userLocations[userName];
 
   if (!loc) {
     return res.status(404).json({ message: "Usuário ainda não enviou localização" });
