@@ -77,7 +77,7 @@ app.get("/", (req, res) => {
 });
 
 // 🚀 Inicializa o servidor
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8000;
 server.listen(PORT, () => {
   console.log(chalk.cyan(`🚀 Servidor rodando na porta ${PORT}`));
 });
